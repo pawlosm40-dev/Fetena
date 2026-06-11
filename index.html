@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TINISHU FAITHMAP - የነገረ ሥላሴ ከፍተኛ ብቃት ፈተና</title>
+    <style>
+        /* ጥቁር እና ነጭ ብቻ (Minimalist Black and White Theme) */
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            border: 2px solid #000000;
+            padding: 30px;
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double #000000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #000000;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .input-group input[type="text"] {
+            border: 1px solid #000000;
+            padding: 8px;
+            background: #ffffff;
+            color: #000000;
+            font-size: 16px;
+        }
+
+        .question-card {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #000000;
+        }
+
+        .question-text {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-size: 14.5px;
+        }
+
+        .option-label input {
+            margin-top: 4px;
+            margin-right: 12px;
+            accent-color: #000000;
+            flex-shrink: 0;
+        }
+
+        .submit-section {
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            background-color: #333333;
+        }
+
+        .submit-btn:disabled {
+            background-color: #888888;
+            cursor: not-allowed;
+        }
+
+        #statusMessage {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            border: 1px solid #000000;
+        }
+
+        @media (max-width: 600px) {
+            .user-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>TINISHU FAITHMAP</h1>
+        <p>የነገረ ሥላሴ (Trinitarian Theology) ከፍተኛ የብቃት መመዘኛ ፈተና</p>
+    </header>
+
+    <form id="quizForm">
+        <div class="user-info">
+            <div class="input-group">
+                <label for="fullName">ሙሉ ስም</label>
+                <input type="text" id="fullName" required placeholder="የተፈታኝ ስም">
+            </div>
+            <div class="input-group">
+                <label for="telegramUser">የቴሌግราม ዩዘርኔም (Telegram Username)</label>
+                <input type="text" id="telegramUser" required placeholder="@username">
+            </div>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="submit-section">
+            <button type="submit" id="submitBtn" class="submit-btn">ፈተናውን ጨርስና ሪፖርት ካርድ ላክ</button>
+        </div>
+    </form>
+
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    const BOT_TOKEN = '8289930496:AAHKqEPvRYaGQfRfsCjSBbyk-53dqzzzu0s';
+    const CHAT_ID = '7388335181';
+
+    const questionsData = [
+        {
+            id: 1,
+            question: "በኒቅያ ጉባኤ (325 ዓ.ም) አርዮስን ለመሞገት የገባው 'ሆሞኡሲዮስ' (Homoousios) የሚለው ቃል ከጉባኤው በፊት በ3ኛው ክፍለ ዘመን በሰባልዮስ ዘንድ በተሳሳተ መንገድ የተረጎመው እንዴት ነበር?",
+            options: ["አብና ወልድ በአካልም በአንድነትም አንድ ናቸው ለማለት", "ወልድ ከአብ የወጣ ፍጡር ነው ለማለት", "መለኮት ሦስት የተለያዩ ባሕርያት አሉት ለማለት", "አብ、 ወልድና መንፈስ ቅዱስ ስሞች ብቻ ናቸው ለማለት"],
+            correct: "ሀ"
+        },
+        {
+            id: 2,
+            question: "የአትናቴዎስ የሃይማኖት መግለጫ (Athanasian Creed) 'የአካል መደባለቅ ሳይኖር、 የባሕርይም መከፈል ሳይኖር' የሚለው መርህ በዋናነት የትኞቹን ሁለት ተቃራኒ የክህደት ትምህርቶች በአንድ ጊዜ ይመታል?",
+            options: ["አርዮስና መቅዶንዮስን", "ሰባልዮስንና አርዮስን", "ንሥጥሮስንና አውጣኪን", "ስምዖን መተተኛውንና ማርቅዮንን"],
+            correct: "ለ"
+        },
+        {
+            id: 3,
+            question: "በነገረ ሥላሴ ትምህርት 'መገባባት' ወይም 'ፐሪኮሬሲስ' (Perichoresis) ማለት ምን ማለት ነው?",
+            options: ["አንዱ አካል ወደ ሌላው አካልነት መለወጡ", "ሦስቱ አካላት ያለመቀዳደም、 ያለመቀላቀልና ያለመለያየት በአንድነት እርስ በርሳቸው በህልውና መኖራቸው", "የአብ አባትነት ወደ ወልድ መሸጋገሩ", "መለኮት በጊዜያት ሂደት ራሱን በሦስት ገጽታ መግለጡ"],
+            correct: "ለ"
+        },
+        {
+            id: 4,
+            question: "በምሥራቅ አብያተ ክርስቲያናት ነገረ መለኮት 'ሞናርኪያ' (Monarchia of the Father) የሚለው ጽንሰ-ሀሳብ ምንን ያረጋግጣል?",
+            options: ["አብ ብቻውን መለኮት መሆኑን", "አብ የሥላሴ አካላት የባሕርይና የህልውና ብቸኛ ምንጭ/ምክንያት (Sole Source/Cause) መሆኑን", "ወልድና መንፈስ ቅዱስ ከአብ በስልጣን እንደሚያንሱ", "መለኮት በአንድ ንጉሣዊ አካል ብቻ እንደሚመራ"],
+            correct: "ለ"
+        },
+        {
+            id: 5,
+            question: "የቅዱስ አውግስጢኖስ 'ሥነ-ልቦናዊ የሥላሴ ምሳሌ' (Psychological Analogy) በሰው ነፍስ ውስጥ ካሉት ከየትኞቹ ሦስት ነገሮች ጋር ይገናኛል?",
+            options: ["ሥጋ面 ነፍስ面 መንፈስ", "ልብ面 ቃል面 ሕይወት", "ማስታወስ面 ማስተዋል面 መውደድ (Memory, Understanding, Will)", "ዕውቀት面 ስሜት面 ተግባር"],
+            correct: "ሐ"
+        },
+        {
+            id: 6,
+            question: "ለመቅዶንዮስ 'መንፈስ ቅዱስ ፍጡር ነው' ለሚለው የክህደት ትምህርት ምላሽ ለመስጠት በቁስጥንጥንያ ጉባኤ (381 ዓ.ም) በሃይማኖት ጸሎት ላይ የገባው ሐረግ የትኛው ነው?",
+            options: ["ከአብና ከወልድ የሠረጸ", "ከአብ የሠረጸ面 ከአብና ከወልድ ጋር በአንድነት የሚሰገድለትና የሚከበርለት", "ከሁለቱ አካላት የተገኘ ሕይወት", "በመጀመሪያ የነበረ ኃይል"],
+            correct: "ለ"
+        },
+        {
+            id: 7,
+            question: "ምዕራባውያን በኒቅያ-ቁስጥንጥንያ የሃይማኖት ጸሎት ላይ 'ፊሊኦክዌ' (Filioque - 'ከወልድም ጭምር') የሚለውን ቃል መጨመራቸው በምሥራቅ አብያተ ክርስቲያናት ዘንድ 'የሥላሴን አንድነት ያፈርሳል' ተብሎ የተነቀፈበት ዋናው የቲዮሎጂ ምክንያት ምንድን ነው?",
+            options: ["ወልድን ከአብ ስለሚያስበልጥ", "ለመንፈስ ቅዱስ ሁለት መነሻ ምንጭ ስለሚፈጥርና የአብን ብቸኛ ምንጭነት (Monarchia) ስለሚጋፋ", "መንፈስ ቅዱስን ፍጡር ስላደረገው", "አብንና ወልድን አንድ አካል ስለሚያደርግ"],
+            correct: "ለ"
+        },
+        {
+            id: 8,
+            question: "በሥላሴ አካላት መካከል 'የማይጋሩ አካላዊ ግብሮች' (Incommunicable Hypostatic Properties) የሚባሉት የትኞቹ ናቸው?",
+            options: ["ልዑልነት面 ፈጣሪነት面 አዳኝነት", "ያለመወለድ (አባትነት)面 መወለድ (ልጅነት)面 መሥረጽ (ሥርፀት)", "ቅድስና面 ኃያልነት面 ዘላለማዊነት", "ቸርነት面 ፍቅር面 ፍርድ"],
+            correct: "ለ"
+        },
+        {
+            id: 9,
+            question: "በነገረ ሥላሴ 'ኡሲያ' (Ousia) እና 'ሂፖσταση' (Hypostasis) በሚሉት ቃላት መካከል ያለውን ፍልስፍናዊ ልዩነት በግልጽ ያስቀመጡትና ሥርዓት ያስያዙት አባቶች ማን ይባላሉ?",
+            options: ["የእስክንድርያው አትናቴዎስና ቄርሎስ", "የቀጰዶቅያ አባቶች (ባስልዮስ面 ጎርጎርዮስ ዘእንዚናንዙ面 ጎርጎርዮስ ዘኑሲስ)", "የአንጾኪያው ዮሐንስና ቴዎድሮስ", "አውግስጢኖስና ሂላሪ"],
+            correct: "ለ"
+        },
+        {
+            id: 10,
+            question: "ኢኮኖሚክ ሥላሴ (Economic Trinity) እና ኦንቶሎጂካል ሥላሴ (Immanent/Ontological Trinity) በሚሉት ጽንሰ-ሀሳቦች መካከል ያለው ልዩነት ምንድን ነው?",
+            options: ["የመጀመሪያው ስለ ሥላሴ በደኅንነት ታሪክና በፍጥረት መገለጥ ሲሆን面 ሁለተኛው በራሳቸው ዘላለማዊ ህልውና ያላቸው የውስጥ ግንኙነት ነው", "የመጀመሪያው በብሉይ ኪዳን ሁለተኛው በሐዲስ ኪዳን ነው", "የመጀመሪያው የአካል ሦስትነትን ሁለተኛው የባሕርይ አንድነትን ያሳያል", "የመጀመሪያው ረቂቅ ሲሆን ሁለተኛው ግዙፍ ነው"],
+            correct: "ሀ"
+        },
+        {
+            id: 11,
+            question: "'ትሪቴኢዝም' (Tritheism) ወይም ሦስት አማልክት የማምለክ ስህተት በዋናነት የሚከሰተው በምን ዓይነት አስተሳሰብ ምክንያት ነው?",
+            options: ["የአካልን ሦስትነት ሙሉ በሙሉ ሲክዱ", "የሥላሴን አካላት እንደ ሦስት የተለያዩ መለኮታዊ ባሕርያት (Distinct Essences) አድርጎ በመቁጠር", "አብ ብቻ መለኮት ነው ሲሉ", "የሰባልዮስን ትምህርት ሲከተሉ"],
+            correct: "ለ"
+        },
+        {
+            id: 12,
+            question: "ቅዱስ ጎርጎርዮስ ዘእንዚናንዙ 'አብ' የሚለው ስም የባሕርይም የሥራ ስም አይደለም፤ የ... ስም ነው ይላል። ባዶ ቦታውን የሚሞላው ትክክለኛ ቃል የትኛው ነው?",
+            options: ["የግንኙነት/የዝምድና (Relation)", "የስልጣን (Authority)", "የፍጥረት (Creation)", "የክብር (Glory)"],
+            correct: "ሀ"
+        },
+        {
+            id: 13,
+            question: "በብሉይ ኪዳን 'ኦሪት ዘፍጥረት 18' ላይ አብርሃም በሰው አምሳል የተገለጡለትን ሦስት እግዶች 'ጌታ ሆይ' (Adonai) ብሎ በአንድ ቁጥር መጥራቱ በነገረ ሥላሴ ምንን ያመለክታል?",
+            options: ["መልአክት መሆናቸውን", "የአካል ሦስትነትንና የባሕርይ/የስልጣን አንድነትን ምሳሌያዊ መገለጥ", "የአብርሃምን መደናገጥ", "የእግዚአብሔርን አንድ አካልነት"],
+            correct: "ለ"
+        },
+        {
+            id: 14,
+            question: "ወልድ ከአብ 'ተወለደ' ሲባል እና ፍጥረት ከአብ 'ተፈጠረ' ሲባል በግሪክ ነገረ መለኮት ምን ዓይነት የቃል ልዩነት አላቸው?",
+            options: ["ጀነሲስ (Genesis) እና ፖይሲስ (Poiesis)", "ጌኔሲስ (Genesi - መወለድ በአንድ 'ን') እና ጌንኔሲስ (Gennesi - መፈጠር በሁለት 'ን')", "ሎጎስ (Logos) እና ሪማ (Rhema)", "ዞኤ (Zoe) እና ባዮስ (Bios)"],
+            correct: "ለ"
+        },
+        {
+            id: 15,
+            question: "ወልድ ከአብ ከመወለዱ የተነሳ 'ከአብ ያንሳል' የሚሉትን ክርክሮች ለማፍረስ 'ዘላለማዊ መወለድ' (Eternal Generation) የሚለውን ጽንሰ-ሀሳብ በስፋት ያስተማረው ቀደመው ሊቅ ማን ነው?",
+            options: ["ኦሪገን (Origen)", "ጠርጡለስ (Tertullian)", "ሄርማስ (Hermas)", "ማርቅዮን"],
+            correct: "ሀ"
+        },
+        {
+            id: 16,
+            question: "በነገረ ሥላሴ 'ኩነት' ወይም 'ትሮፖስ ሂፓርክሲዮስ' (Mode of Existence) ማለት ምን ማለት ነው?",
+            options: ["መለኮት የሚቀያየርበት ሁኔታ", "አካላት መለኮታዊ ባሕርያቸውን የሚኖሩበትና የሚገልጡበት ልዩ አካላዊ መንገድ (አባትነት面 ልጅነት面 ሥርፀት)", "የአማልክት ስብስብ", "የስጋዌ ምስጢር"],
+            correct: "ለ"
+        },
+        {
+            id: 17,
+            question: "ዳይናሚክ ሞናርኪያኒዝም (Dynamic Monarchianism) ወይም አዶፕሺኒዝም (Adoptionism) በመባል የሚታወቀው የክህደት ትምህርት ይዘት ምንድን ነው?",
+            options: ["ኢየሱስ ተራ ሰው ነበረ面 ነገር ግን በጥምቀቱ ጊዜ መለኮታዊ ኃይል አደረበትና የእግዚአብሔር ልጅ ተባለ", "ኢየሱስ የእግዚአብሔር ስም እንጂ አካል አይደለም", "መንፈስ ቅዱስ ብቻ አምላክ ነው", "ሥላሴ በሦስት ዘመን የተገለጡ ናቸው"],
+            correct: "ሀ"
+        },
+        {
+            id: 18,
+            question: "በቅዱስ ዮሐንስ ወንጌል 14:28 ላይ 'አብ ከእኔ ይበልጣል' የሚለው የክርስቶስ ቃል በነገረ መለኮት ሊቃውንት የሚተረጎመው እንዴት ነው?",
+            options: ["እንደ መለኮቱ ወልድ ከአብ እንደሚያንስ", "በስጋዌው (በሰውነቱ) እና በአካላዊ የሥርዓት ግንኙነት አብ መነሻ በመሆኑ እንጂ በባሕርይ መበላለጥ አይደለም", "ኢየሱስ አምላክ ስላልሆነ", "መንፈስ ቅዱስ ከሁለቱም ስለሚበልጥ"],
+            correct: "ለ"
+        },
+        {
+            id: 19,
+            question: "የሥላሴን አንድነትና ሦስትነት በፀሐይ (ክበብ面 ብርሃን面 ሙቀት) መምሰል ስህተት የሚሆንበትና 'ሞዳሊዝም' (Modalism) ውስጥ የሚከተው ለምንድን ነው?",
+            options: ["ብርሃንና ሙቀት የፀሐይ 'ባሕርያት/ውጤቶች' እንጂ ራሳቸውን የቻሉ 'ነጻ አካላት' (Hypostases) ስላልሆኑ", "ፀሐይ ፍጡር ስለሆነች", "ሙቀት ከብርሃን ስለሚቀድም", "ክበቡ ስለሚታይ"],
+            correct: "ሀ"
+        },
+        {
+            id: 20,
+            question: "በነገረ ሥላሴ 'ኦፔራ አድ ኤክስትራ' (Opera ad extra sunt conjunta) የሚለው የመለኮት መርህ ምንን ይገልጻል?",
+            options: ["አካላት በውስጣቸው ይለያያሉ", "የሥላሴ የውጭ ሥራዎች (ፍጥረት面 ደኅንነት) ሁሉ የአንድ መለኮት የማይከፈል የጋራ ሥራዎች ናቸው", "አብ ብቻ ይፈጥራል面 ወልድ ብቻ ያድናል", "መንፈስ ቅዱስ ዓለምን አይጠብቅም"],
+            correct: "ለ"
+        },
+        {
+            id: 21,
+            question: "በግሪክ ነገረ መለኮት 'አውቶቴዎስ' (Autotheos) የሚለው ቃል ትርጉም ምንድን ነው?",
+            options: ["በራሱ አምላክ የሆነ (ወልድና መንፈስ ቅዱስ በባሕርያቸው እውነተኛ አምላክ መሆናቸውን ለማረጋገጥ የሚሠራበት)", "ሰው የሆነ አምላክ", "ሁለተኛው አምላክ", "የሐሰት አምላክ"],
+            correct: "ሀ"
+        },
+        {
+            id: 22,
+            question: "የቀጰዶቅያ አባቶች 'አንድ ባሕርይ (ኡሲያ) ለሦስት አካላት (ሂፖσταση)' ያለውን ግንኙነት በምድር ካለው ከምን ጋር አመሳስለውታል?",
+            options: ["አንድ የሰው ልጅነት የጋራ ባሕርይ ለሦስት የተለያዩ ሰዎች (ለምሳሌ፦ ጴጥሮስ面 ዮሐንስ面 ጳውሎስ)", "አንድ ዛፍ ለሦስት ቅርንጫፎች", "አንድ ወንዝ ለሦስት ምንጮች", "አንድ እሳት ለሦስት ነበልባሎች"],
+            correct: "ሀ"
+        },
+        {
+            id: 23,
+            question: "'ፓትሪፓሲያኒዝም' (Patripassianism) በመባል የሚታወቀውና ምዕራባውያን ሰባልዮስን የወቀሱበት ትምህርት ስህተቱ ምንድን ነው?",
+            options: ["አብ አልተሰቀለም ማለት", "አብ面 ወልድና መንፈስ ቅዱስ አንድ አካል ናቸው ካሉ 'በመስቀል ላይ የሞተው አብ ራሱ ነው' ወደሚል ስህተት ስለሚመራ", "ወልድ ብቻውን አምላክ ነው ማለት", "መንፈስ ቅዱስ መከራ ተቀበለ ማለት"],
+            correct: "ለ"
+        },
+        {
+            id: 24,
+            question: "በነገረ ሥላሴ ትምህርት 'አሲኢቲ' (Aseity) የሚለው መለኮታዊ ጠባይ ምንን ያመለክታል?",
+            options: ["የእግዚአብሔር ከማንም ምንጭ ሳይኖረው ሙሉ በሙሉ በራሱ ህልውና ጸንቶ መኖሩ (Self-existence)", "ሁሉን ማወቅ", "በሁሉም ቦታ መገኘት", "መለዋወጥ"],
+            correct: "ሀ"
+        },
+        {
+            id: 25,
+            question: "ቅዱስ አትናቴዎስ 'ወልድ ከአብ ባሕርይ የተወለደ ነው፤ ፍጥረት ግን ከአብ ... የተገኘ ነው' በማለት በምን ለየው?",
+            options: ["ከአብ ኃይል", "ከአብ ፈቃድ (Will)", "ከአብ ቁጣ", "ከአብ ሐሳብ"],
+            correct: "ለ"
+        },
+        {
+            id: 26,
+            question: "በ4ኛው ክፍለ ዘመን አጋማሽ የነበሩትና 'ሆሞዩሲያውያን' (Homoiousians) በመባል የሚታወቁት ከፊል-አርዮሳውያን የነበራቸው አቋም ምን ነበር?",
+            options: ["ወልድ ከአብ ጋር 'ፍጹም አንድ ባሕርይ' ነው", "ወልድ ከአብ ጋር 'ተመሳሳይ ባሕርይ' (Like in Essence) እንጂ 'አንድ' አይደለም", "ወልድ ከአብ ጋር ፍጹም የተለየ ነው", "ወልድ አካል የለውም"],
+            correct: "ለ"
+        },
+        {
+            id: 27,
+            question: "የተርቱሊያን (Tertullian) ትልቁ የነገረ ሥላሴ አስተዋጽኦ በላቲን ሥነ-መለኮት ምን ቃላትን ለመጀመሪያ ጊዜ ማስተዋወቁ ነው?",
+            options: ["Trinitas (ሥላሴ) እና Persona (አካል)", "Essentia እና Substance", "Logos እና Sophia", "Deus እና Spiritus"],
+            correct: "ሀ"
+        },
+        {
+            id: 28,
+            question: "በሳቤልዮስ አስተምህሮ 'መለኮት ራሱን የገለጠው በሦስት ተከታታይ ዘመናት ነው' ሲል 'የወልድ ዘመን' የሚለው የትኛውን ነበር?",
+            options: ["ከዓለም ፍጥረት በፊት ያለውን", "ከሥጋዌ እስከ ዕርገት ያለውን የሐዲስ ኪዳን ዘመን", "ከዕርገት በኋላ ያለውን የቤተክርስቲያን ዘመን", "የብሉይ ኪዳን የሕግ ዘመን"],
+            correct: "ለ"
+        },
+        {
+            id: 29,
+            question: "ቅዱስ ኤጲፋንዮስና ታላቁ ባስልዮስ 'ሥላሴ' በሚለው ምስጢር ውስጥ 'ቁጥር' (Number) እንዴት መታሰብ እንዳለበት ያስተምራሉ?",
+            options: ["ቁጥር አካላትን ለመለየት እንጂ በመለኮታዊ ባሕርይ መካከል ክፍፍልን ወይም መበላለጥን ለማሳየት አይሠራም", "መለኮት በትክክል በሦስት ይከፈላል", "ቁጥር መናገር ኃጢአት ነው", "አማልክት ሦስት መሆናቸውን ያረጋግጣል"],
+            correct: "ሀ"
+        },
+        {
+            id: 30,
+            question: "በነገረ ሥላሴ 'ኢንዲቪሲብል' (Indivisible) ማለት ምን ማለት ነው?",
+            options: ["የሥላሴ አካላት በባሕርይ የማይከፈሉና የማይነጠሉ መሆናቸው", "አካላት የማይታዩ መሆናቸው", "ስሞች የማይለወጡ መሆናቸው", "መለኮት የማይሞት መሆኑ"],
+            correct: "ሀ"
+        },
+        {
+            id: 31,
+            question: "በእስክንድርያው ሊቅ በቅዱስ ቄርሎስ ነገረ መለኮት 'ወልድ ከአብ የተወለደው በባሕርይ (By Nature) ነው' ሲባል ምን ማለት ነው?",
+            options: ["አብ ወልድን የወለደው በግዴታ ነው", "መወለዱ የአብ የባሕርዩ መገለጫ እንጂ ከጊዜ በኋላ በፈቃዱ የፈጠረው የፍጥረት ሥራ አይደለም", "የሰው ልጅ መወለድ ዓይነት ነው", "ከተፈጥሮ የተገኘ ነው"],
+            correct: "ለ"
+        },
+        {
+            id: 32,
+            question: "በፍልስፍናዊ ነገረ መለኮት 'ኒዮ-ፕላቶኒዝም' (Neo-Platonism) የሥላሴን ትምህርት ለማርከስ የተጠቀመበት ጽንሰ-ሀሳብ የትኛው ነው?",
+            options: ["ኤማኔሽን (Emanation - ከበላይ ወደ ታች እየቀነሰ መውረድ)", "ዱአሊዝም (Dualism)", "ማቴሪያሊዝም (Materialism)", "ፓንቴኢዝም (Pantheism)"],
+            correct: "ሀ"
+        },
+        {
+            id: 33,
+            question: "መንፈስ ቅዱስ ከአብ 'የመሥረጹ' ምስጢር (Procession) እና ወልድ ከአብ 'የመወለዱ' ምስጢር (Generation) በባሕርይ ደረጃ ያላቸው ልዩነት በሰው አእምሮ እንዴት ይታወቃል?",
+            options: ["መንፈስ ቅዱስ ቀድሞ በመውጣቱ", "ሁለቱም ከአብ የመገኘታቸው ልዩ መንገዶች መሆናቸውን መጽሐፍ ቢነግረንም面 ልዩነቱ ግን በሰው አእምሮ የማይመረመር ረቂቅ ምስጢር ነው", "መሥረጽ ማለት መፈጠር ማለት ስለሆነ", "ወልድ መጀመሪያ ስለተወለደ"],
+            correct: "ለ"
+        },
+        {
+            id: 34,
+            question: "የቶሌዶ ጉባኤ (589 ዓ.ም) በምዕራብ አውሮፓ የፊሊኦክዌን ቃል በይፋ ያስገባቸው በዋናነት የትኞቹን መናፍቃን ለመመከት ነበር?",
+            options: ["በስፔን የነበሩ አርዮሳውያንን (Visigothic Arians)", "ሰባልዮሳውያንን", "ንስጥሮሳውያንን", "ማኒያውያንን"],
+            correct: "ሀ"
+        },
+        {
+            id: 35,
+            question: "በቅዱስ ጎርጎርዮስ ዘኑሲስ አስተምህሮ 'አብ መነሻ (Cause)面 ወልድና መንፈስ ቅዱስ ደግሞ ውጤቶች' ተብለው መጠራታቸው በምን ምክንያት ነው?",
+            options: ["ጊዜያዊ ፍጡራን ስለሆኑ", "የህልውናቸው ምንጭ አካላዊ አባትነትና ሥርፀት ከአብ በመሆኑ እንጂ የባሕርይ መበላለጥን አያሳይም", "አብ ስለሚበልጣቸው", "በፍልስፍና ስለሚያምን"],
+            correct: "ለ"
+        },
+        {
+            id: 36,
+            question: "በማቴዎስ ወንጌል 28:19 ላይ 'በአብ በወልድና በመንፈስ ቅዱስ ስም' ሲል 'ስም' የሚለው ቃል በአንድ ቁጥር (Singular) መግባቱ በነገረ መለኮት ምን ተብሎ ይተረጎማል?",
+            options: ["የሥላሴን የአንድነት ባሕርይና አንድ መለኮትነት (One Divine Essence)", "አብ ብቻ ስም እንዳለው", "የሦስቱ አካላት መደባለቅ", "ቃሉ ስለተሳሳተ"],
+            correct: "ሀ"
+        },
+        {
+            id: 37,
+            question: "ከሚከተሉት መግለጫዎች ውስጥ 'ፓርሺያሊዝም' (Partialism) የሚባለውን የሥላሴ የክህደት ምሳሌ የሚገልጸው የትኛው ነው?",
+            options: ["እያንዳንዱ አካል የመለኮት ሲሶ (አንድ ሦስተኛ) ክፍል ነው፤ ሦስቱ ሲደመሩ አንድ አምላክ ይሆናሉ የሚለው አስተሳሰብ", "ሥላሴ ስም ብቻ ናቸው ማለት", "አብ መጀመሪያ ነበረ ማለት", "መንፈስ ቅዱስ ኃይል ነው ማለት"],
+            correct: "ሀ"
+        },
+        {
+            id: 38,
+            question: "በነገረ ሥላሴ 'ኢንሄረንስ' (Inherence) ማለት ምን ማለት ነው?",
+            options: ["የባሕርይ ጠባያት በአካላት ውስጥ ፍጹም ጸንተው መኖራቸው", "ከውጭ የሚመጣ ኃይል", "መለኮት ዓለምን መልቀቁ", "የአካል መጥፋት"],
+            correct: "ሀ"
+        },
+        {
+            id: 39,
+            question: "የፍራንክፈርት ጉባኤ (794 ዓ.ም) ከእስልምና አስተሳሰብ ጋር በመመሳሰል 'ክርስቶስ በባሕርዩ የእግዚአብሔር ልጅ አይደለም面 የጸጋ ልጅ ነው' ያሉትን የትኞቹን መናፍቃን አወገዘ?",
+            options: ["አዶፕሺኒስቶች (Spanish Adoptionists)", "አርዮሳውያን", "ሰባልዮሳውያን", "መቅዶንዮሳውያን"],
+            correct: "ሀ"
+        },
+        {
+            id: 40,
+            question: "በነገረ ሥላሴ ምስጢር 'አንድነት በሦስትነት面 ሦስትነት በአንድነት' (Unity in Trinity and Trinity in Unity) የሚለው መርህ ሲጠቃለል የሚከተለውን ይከለክላል፦",
+            options: ["ሁሉንም አማልክት ማምለክ", "በአንድነት ስም አካላትን መደባለቅን (Sabelianism) እና በሦስትነት ስም ባሕርይን መከፈልን (Arianism/Tritheism)", "መጽሐፍ ቅዱስን ማንበብ", "ፍልስፍናን ሙሉ በሙሉ መጠቀም"],
+            correct: "ለ"
+        }
+    ];
+
+    // ጥያቄዎቹን በገጹ ላይ መጫን
+    const container = document.getElementById('questionsContainer');
+    questionsData.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        
+        let optionsHTML = '';
+        q.options.forEach((opt, optIndex) => {
+            const optLetter = String.fromCharCode(4608 + optIndex); // ሀ, ለ, ሐ, መ
+            optionsHTML += `
+                <label class="option-label">
+                    <input type="radio" name="q${q.id}" value="${optLetter}" required>
+                    <strong>${optLetter})</strong> &nbsp;${opt}
+                </label>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="question-text">${q.id}. ${q.question}</div>
+            <div class="options-group">${optionsHTML}</div>
+        `;
+        container.appendChild(card);
+    });
+
+    // ፎርሙ ሲላክ ውጤት አስልቶ በሪፖርት ካርድ መልክ መላክ
+    document.getElementById('quizForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerText = "ሪፖርት ካርድ በመላክ ላይ...";
+        statusMessage.style.display = "block";
+        statusMessage.style.background = "#eeeeee";
+        statusMessage.style.color = "#000000";
+        statusMessage.innerText = "ውጤትዎ እየታረመና ሪፖርት ካርዱ እየተዘጋጀ ነው...";
+
+        const fullName = document.getElementById('fullName').value;
+        const telegramUser = document.getElementById('telegramUser').value;
+
+        let correctCount = 0;
+        let reportDetails = "";
+
+        // ውጤት ማረም
+        questionsData.forEach(q => {
+            const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+            const userAns = selected ? selected.value : 'X';
+            const isCorrect = userAns === q.correct;
+            
+            if (isCorrect) correctCount++;
+            
+            reportDetails += `ጥያቄ ${q.id}: ${userAns} [${isCorrect ? '✓' : '✗ (ትክክል: ' + q.correct + ')'}]\n`;
+        });
+
+        const scorePercentage = ((correctCount / 40) * 100).toFixed(1);
+        const status = scorePercentage >= 50 ? "✅ ያለፈ (PASSED)" : "❌ የወደቀ (FAILED)";
+
+        // 📝 የሪፖርት ካርድ ፅሁፍ መዋቅር (ወደ ቴሌግራም የሚሄድ)
+        const telegramMessage = 
+`📋 **TINISHU FAITHMAP - የፈተና ሪፖርት ካርድ** 📋
+--------------------------------------------
+👤 **የተፈታኝ ስም:** ${fullName}
+✈️ **ቴሌግራም:** ${telegramUser}
+--------------------------------------------
+📊 **የማርክ ማጠቃለያ (Summary):**
+• ጠቅላላ ጥያቄ፡ 40
+• ትክክል የተመለሱ፡ ${correctCount}
+• ስህተት የተመለሱ፡ ${40 - correctCount}
+• ያገኘው ውጤት፡ \`${scorePercentage}%\`
+• የብቃት ደረጃ፡ **${status}**
+--------------------------------------------
+📝 **የእያንዳንዱ ጥያቄ ዝርዝር ማረሚያ፦**
+\`\`\`
+${reportDetails}
+\`\`\`
+--------------------------------------------
+📅 ቀን: ${new Date().toLocaleDateString('am-ET')}`;
+
+        try {
+            const textUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            const textResponse = await fetch(textUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: telegramMessage,
+                    parse_mode: 'Markdown'
+                })
+            });
+
+            if (textResponse.ok) {
+                statusMessage.style.background = "#000000";
+                statusMessage.style.color = "#ffffff";
+                statusMessage.innerText = `💥 ስኬት! የ ${fullName} የፈተና ሪፖርት ካርድ በተሳካ ሁኔታ ወደ ማህደሩ ተልኳል። ውጤት፡ ${scorePercentage}%`;
+                document.getElementById('quizForm').reset();
+            } else {
+                throw new Error("መረጃውን መላክ አልተቻለም።");
+            }
+
+        } catch (error) {
+            console.error(error);
+            statusMessage.style.background = "#ffffff";
+            statusMessage.style.color = "#ff0000";
+            statusMessage.style.borderColor = "#ff0000";
+            statusMessage.innerText = "❌ የስርዓት ስህተት! እባክዎ ኢንተርኔትዎን አረጋግጠው ድጋሚ ይሞክሩ።";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "ፈተናውን ጨርስና ሪፖርት ካርድ ላክ";
+        }
+    });
+</script>
+
+</body>
+</html>
