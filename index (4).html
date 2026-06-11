@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tinishu Faithmap - ነገረ ሥላሴ እና አመክንዮ</title>
+    <style>
+        /* በጥቁርና ነጭ የተሰራ ፅዱ ስታይል (Minimalist Black & White Theme) */
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #000000;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .description {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        .user-info-section {
+            border: 1px solid #000000;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #fafafa;
+        }
+        .user-info-section h3 {
+            margin-top: 0;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000000;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #000000;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .options li {
+            margin-bottom: 8px;
+        }
+        label {
+            cursor: pointer;
+            display: inline-block;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            accent-color: #000000;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #333333;
+        }
+        #result-status {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tinishu Faithmap</h1>
+    <p class="description">በነገረ ሥላሴ፣ አመክንዮ (LPT) እና የማንነት መርሆዎች (Identity Theories) ላይ የተዘጋጀ ፈታኝ ማጠቃለያ ፈተና</p>
+    
+    <!-- የተፈታኝ መረጃ መቀበያ ፎርም -->
+    <div class="user-info-section">
+        <h3>የተፈታኝ መረጃ (ግዴታ ነው)</h3>
+        <div class="form-group">
+            <label for="full-name">ሙሉ ስም፦</label>
+            <input type="text" id="full-name" placeholder="እባክዎ ሙሉ ስምዎን ያስገቡ">
+        </div>
+        <div class="form-group">
+            <label for="tg-username">የቴሌግራም ዩዘርኔም (Telegram Username)፦</label>
+            <input type="text" id="tg-username" placeholder="@ምሳሌ">
+        </div>
+    </div>
+
+    <div id="quiz-container">
+        <!-- ጥያቄዎች እዚህ በጃቫስክሪፕት በኩል ይመነጫሉ -->
+    </div>
+
+    <button class="btn-submit" onclick="submitQuiz()">መልሶችን መርምርና ወደ ቦት ላክ</button>
+    <div id="result-status"></div>
+</div>
+
+<script>
+    // የቴሌግራም ቦት መረጃዎች
+    const BOT_TOKEN = '8289930496:AAHKqEPvRYaGQfRfsCjSBbyk-53dqzzzu0s';
+    const CHAT_ID = '7388335181';
+
+    // 40 የነገረ-መለኮትና የአመክንዮ ጥያቄዎች (LPT ስህተት የታረመበት)
+    const questions = [
+        { q: "የአብ መለኮት መሆን፣ የወልድ መለኮት መሆን፣ ነገር ግን አብ ወልድ አለመሆኑን በአመክንዮ ለመፍታት የሚሞክረው ቲዎሪ ማን ይባላል?", o: ["LPT (Logical Problem of Trinity)", "Relative Identity", "Absolute Identity", "Modalism"], a: 0 },
+        { q: "በፍልስፍና 'A = B' እና 'B = C' ከሆነ 'A = C' መሆን አለበት የሚለው ሕግ ምን ይባላል?", o: ["Symmetric Property", "Transitive Property of Identity", "Reflexive Property", "Asymmetric Property"], a: 1 },
+        { q: "የሥላሴን አስተምህሮ ለማስረዳት Transitivity (የማንነት መተላለፍ) ሕግ በሥላሴ አካላት መካከል አይሰራም የሚለው እይታ የትኛው ነው?", o: ["Absolute Identity", "Relative Identity Theory", "Modalism", "Sabellianism"], a: 1 },
+        { q: "አብ፣ ወልድ እና መንፈስ ቅዱስ የአንድ አምላክ የተለያዩ 'ገጾች' ወይም 'ሁኔታዎች' (Modes) ናቸው የሚለው ምንፍቅና?", o: ["Arianism", "Tritheism", "Modalism (ሞዳሊዝም)", "Docetism"], a: 2 },
+        { q: "በAbsolute Identity (ፍፁም ማንነት) እይታ፣ ሁለት ነገሮች ፍፁም አንድ ናቸው ከተባለ ምን መሆን አለባቸው?", o: ["ሁሉንም ባህሪያት እኩል መጋራት አለባቸው (Leibniz's Law)", "በስም ብቻ መመሳሰል አለባቸው", "የተለያዩ ህልውና ሊኖራቸው ይችላል", "ምንም ግንኙነት የላቸውም"], a: 0 },
+        { q: "ሞዳሊዝም በቤተክርስቲያን ታሪክ መጀመሪያ አካባቢ በማን ስም ይታወቃል?", o: ["አርዮስ", "ሰባልዮስ (Sabellianism)", "ንስጥሮስ", "መቅዶንዮስ"], a: 1 },
+        { q: "አብ ወልድን ፈጥሮታል፣ ስለዚህ ወልድ ፍጡር ነው የሚለው የምንፍቅና እይታ የትኛው ነው?", o: ["Arianism (አርዮሳዊነት)", "Modalism", "Tritheism", "Partialism"], a: 0 },
+        { q: "በRelative Identity መሠረት 'አብና ወልድ በአምላክነት አንድ ናቸው ነገር ግን በአካል የተለያዩ ናቸው' ሲባል ማንነታቸው ከምን አንጻር ይነጻጸራል?", o: ["ከስም አንጻር ብቻ", "ከሚገልጻቸው ስም (Sortal Term/Kind) አንጻር", "ከጊዜ አንጻር", "ከቦታ አንጻር"], a: 1 },
+        { q: "ሥላሴን እንደ ሦስት የተለያዩ አማልክት (Three Separate Gods) አድርጎ የሚመለከተው ስህተት ምን ይባላል?", o: ["Modalism", "Tritheism (ትራይቴይዝም/ሦስት አምላክነት)", "Monarchianism", "Binitarianism"], a: 1 },
+        { q: "አብ፣ ወልድ፣ መንፈስ ቅዱስ እያንዳንዳቸው የፈጣሪ ሲሶ (አንድ ሦስተኛ) ክፍል ናቸው የሚለው የስህተት ትምህርት?", o: ["Partialism (ፓርሻሊዝም)", "Modalism", "Arianism", "Tritheism"], a: 0 },
+        { q: "የ LPT (Logical Problem of Trinity) ዋነኛ የአመክንዮ ፈተና ምንድነው?", o: ["የእግዚአብሔር መኖር አለመኖር", "የአንድነትና የሦስትነት አመክንዮአዊ አለመቃረን ማሳየት", "የትንሳኤ ምስጢር", "የመላእክት ተፈጥሮ"], a: 1 },
+        { q: "በነገረ ሥላሴ 'አካል' (Hypostasis) እና 'ባህርይ' (Ousia) ምን እና ምን ናቸው?", o: ["አካል የጋራ ነው፣ ባህርይ የግል ነው", "አካል የግል መለያ ነው፣ ባህርይ የጋራ መለኮታዊ ተፈጥሮ ነው", "ሁለቱም አንድ ናቸው", "ሁለቱም ፍጡራን ናቸው"], a: 1 },
+        { q: "የአብ መወለድ አለመኖር (Ingeneracy) እና የወልድ መወለድ (Generation) ምንን ያሳያሉ?", o: ["የባህርይ መበላለጥን", "የአካል መለያያ የሃይፖስታቲክ ባህሪያትን", "የጊዜ ቅደም ተከተልን", "ምንፍቅናን"], a: 1 },
+        { q: "ሞዳሊዝም 'Patripassianism' በሚል ስምም ይጠራል፤ ትርጉሙ ምንድነው?", o: ["ወልድ አልተሰቀለም የሚል", "አብ ራሱ በዕፀ መስቀል ላይ መከራ ተቀበለ የሚል", "መንፈስ ቅዱስ ብቻ ነው የመጣው የሚል", "ሥላሴ አልተሰቀሉም የሚል"], a: 1 },
+        { q: "ፍፁም አንድነት (Absolute Identity) በሥላሴ ላይ በቀጥታ ከተተገበረ የትኛውን ምንፍቅና ያስከትላል?", o: ["Tritheism ወይም Modalism", "Arianism", "Nestorianism", "Pelagianism"], a: 0 },
+        { q: "በ Relative Identity መርህ የፈለሰፉት ፈላስፋ ማን ይባላሉ?", o: ["አልበርት አንስታይን", "ፒተር ጊች (Peter Geach)", "ቶማስ አኳይናስ", "ሬኔ ዴካርት"], a: 1 },
+        { q: "እግዚአብሔር አንድ አካል ነው፣ ነገር ግን በብሉይ ኪዳን እንደ አብ፣ በአዲስ ኪዳን እንደ ወልድ፣ አሁን ደግሞ እንደ መንፈስ ቅዱስ ሆኖ ተገለጠ የሚለው ትምህርት ምንድነው?", o: ["Chronological Modalism", "Functional Modalism", "Tritheism", "Arianism"], a: 0 },
+        { q: "አመክንዮአዊው 'የማንነት መተላለፍ' (Transitivity of Identity) ሕግ የማይሰማማው ከየትኛው የሥላሴ እውነት ጋር ነው?", o: ["አብ አምላክ ነው፣ ወልድ አምላክ ነው፣ አብ ግን ወልድ አይደለም ከሚለው ጋር", "አብ ፈጣሪ ነው ከሚለው ጋር", "እግዚአብሔር ፍቅር ነው ከሚለው ጋር", "መጽሐፍ ቅዱስ እውነት ነው ከሚለው ጋር"], a: 0 },
+        { q: "ሥላሴን እንደ ውሃ፣ በረዶና ትነት (Steam, Ice, Water) አድርጎ መመሰል የትኛውን ምንፍቅና ይደግፋል?", o: ["Arianism", "Modalism", "Partialism", "Tritheism"], a: 1 },
+        { q: "ሥላሴን እንደ ባለ ሦስት ቅጠል ክሎቨር (Three-leaf clover) መመሰል የትኛውን ስህተት ያመጣል?", o: ["Partialism (ክፍል አድርጎ ማየት)", "Modalism", "Arianism", "Monarchianism"], a: 0 },
+        { q: "ወልድ ከአብ ዝቅ ይላል ወይም የአብ የበታች ነው የሚለው የምንፍቅና ዝንባሌ ምን ይባላል?", o: ["Subordinationism (ሱቦርዲኔሺያኒዝም)", "Modalism", "Sabellianism", "Tritheism"], a: 0 },
+        { q: "በ Relative Identity እይታ 'x is the same F as y' ሲባል F ምንድነው?", o: ["ፎርሙላ", "Sortal concept (የባህርይ/የአይነት መገለጫ)", "የጊዜ መለኪያ", "ውሸት"], a: 1 },
+        { q: "ከሚከተሉት ውስጥ የሞዳሊዝም ዋና መከራከሪያ ጥቅስ ተደርጎ በስህተት የሚወሰደው የትኛው ነው?", o: ["'እኔና አብ አንድ ነን' (ዮሐ 10:30) በፍፁም አካላዊ አንድነት መተርጎም", "'አብ ከእኔ ይበልጣል'", "'መጀመሪያ ቃል ነበረ'", "'እግዚአብሔር ብርሃን ነው'"], a: 0 },
+        { q: "የአትናቴዎስ የሃይማኖት መግለጫ (Athanasian Creed) የትኛውን በጥብቅ ይቃወማል?", o: ["አካላትን መቀላቀልንና ባህርይን መክፈልን", "የሳይንስ ግኝቶችን", "የአይሁድ እምነትን ብቻ", "የግሪክ ቋንቋን"], a: 0 },
+        { q: "የእግዚአብሔር አካላት ሦስት የተለያዩ 'ማንነቶች' (Personhoods) ሳይሆኑ ሦስት የተለያዩ 'ግንኙነቶች' (Relations) ናቸው ያለው ማን ነው?", o: ["አውግስጢኖስ / ቶማስ አኳይናስ", "አርዮስ", "ሰባልዮስ", "ማርክሲዮን"], a: 0 },
+        { q: "በመጽሐፍ ቅዱስ የክርስቶስ ጥምቀት ጊዜ ሦስቱም አካላት በአንድ ጊዜ መገለጣቸው የትኛውን ምንፍቅና ውድቅ ያደርጋል?", o: ["Modalism (ምክንያቱም በአንድ ጊዜ በተለያየ አካል ተገልጠዋል)", "Arianism", "Gnosticism", "Pelagianism"], a: 0 },
+        { q: "ወልድ ፍጡር ካልሆነ 'የበኩር' (Firstborn) መባሉ ምን ማለት ነው? (ለአርዮሳውያን መልስ)", o: ["በጊዜ ቀዳሚ ማለት ነው", "የስልጣንና የክብር ባለቤትነትን (Preeminence) ያሳያል", "የመጀመሪያው የተፈጠረ ማለት ነው", "ምንም ትርጉም የለውም"], a: 1 },
+        { q: "በፍልስፍና 'Indiscernibility of Identicals' የሚለው ህግ ለማን ይባላል?", o: ["የካንት ህግ", "የሌብኒዝ ህግ (Leibniz's Law)", "የአርስቶትል ህግ", "የፕላቶ ህግ"], a: 1 },
+        { q: "መንፈስ ቅዱስ ከአብና ከወልድ የሰረጸ (Proceeds) መለኮታዊ አካል ሳይሆን ኃይል ብቻ ነው የሚለው ምንፍቅና?", o: ["Macedonianism (መቅዶንዮሳዊነት)", "Arianism", "Nestorianism", "Apollinitarianism"], a: 0 },
+        { q: "ኢየሱስ ተራ ሰው ነበረ፣ ነገር ግን በጥምቀቱ ጊዜ መለኮታዊ ኃይል አደረበትና የእግዚአብሔር ልጅ ሆነ የሚለው የምንፍቅና አይነት?", o: ["Adoptionism (የጉዲፈቻ ክሪስቶሎጂ)", "Modalism", "Docetism", "Monophysitism"], a: 0 },
+        { q: "የሥላሴ አካላት በአንድ መለኮታዊ ህልውና ውስጥ እርስ በእርስ መኖራቸውና መጣመራቸው (Mutual Indwelling) ምን ይባላል?", o: ["Perichoresis (ፔሪኮሬሲስ / ኪናዊ መለኮት)", "Transubstantiation", "Consubstantiation", "Hypostatic Union"], a: 0 },
+        { q: "በፍፁም ማንነት (Absolute Identity) አመክንዮ መሠረት የሥላሴን አስተምህሮ ሳይቃረኑ ማስረዳት ይቻላል የሚሉ ክርስቲያን ፈላስፋዎች ምን ይባላሉ?", o: ["Absolute Trinitarians / Social Trinitarians", "Modalists", "Unitarians", "Atheists"], a: 0 },
+        { q: "Social Trinitarianism (ማኅበራዊ ሥላሴ) ለየትኛው ምንፍቅና የመቃረብ አደጋ አለው?", o: ["Tritheism (ሦስት አምላክነት)", "Modalism", "Arianism", "Docetism"], a: 0 },
+        { q: "Latin Trinitarianism (በአንድነት ላይ የሚያተኩረው) ደግሞ ለየትኛው ምንፍቅና የመጋለጥ ዕድል አለው?", o: ["Modalism (ሞዳሊዝም)", "Tritheism", "Arianism", "Nestorianism"], a: 0 },
+        { q: "ክርስቶስ በምድር ላይ በነበረ ጊዜ ፍፁም ሰው አልነበረም፣ ሰው የበሰለው መልክ ብቻ ነበረው (illusion) የሚለው ስህተት?", o: ["Docetism (ዶሰቲዝም)", "Arianism", "Modalism", "Pelagianism"], a: 0 },
+        { q: "በአመክንዮ 'Identity' (ማንነት) የሚለው ጽንሰ-ሀሳብ በሥላሴ ውስጥ ሲተረጎም ምስጢር (Mystery) የሚሆነው ለምንድነው?", o: ["የሰው አእምሮ ውስን ስለሆነና መለኮታዊ ህልውና ከፍጡር ህግ በላይ ስለሆነ", "ምክንያቱም ውሸት ስለሆነ", "ምንም ማረጋገጫ ስለሌለው", "የቋንቋ ችግር ስላለ ብቻ"], a: 0 },
+        { q: "ሥላሴን እንደ ፀሐይ፣ ብርሃንና ሙቀት አድርጎ መመሰል የትኛውን ችግር ይፈጥራል?", o: ["Arianism ወይም Modalism (ብርሃንና ሙቀት ከቀፎው እንደሚወጡ ኃይላት ስለሚታዩ)", "Tritheism", "Nestorianism", "ምንም ችግር የለውም"], a: 0 },
+        { q: "እግዚአብሔር አንድ 'ኦውሲያ' (Substance) እና ሦስት 'ሃይፖስታሲስ' (Persons) አለው የሚለው ቀመር የትኛው ጉባኤ ላይ የጸና ነው?", o: ["የኒቂያ እና የቁስጥንጥንያ ጉባኤ", "የኤፌሶን ጉባኤ", "የኬልቄዶን ጉባኤ", "የቫቲካን ጉባኤ"], a: 0 },
+        { q: "የአብ አባት መሆን፣ የወልድ ልጅ መሆን በአምላክነታቸው ላይ ልዩነት ያመጣል?", o: ["አያመጣም፣ የአካል እንጂ የባህርይ (መለኮት) ልዩነት አይደለም", "ያመጣል፣ አብ ይበልጣል", "ያመጣል፣ ወልድ ይበልጣል", "ሁለቱም ፍጡራን ናቸው"], a: 0 },
+        { q: "አመክንዮአዊው የሥላሴ ችግር (LPT) የሚያሳየን ምንድነው?", o: ["ሃይማኖትና አመክንዮ ሁልጊዜ እንደሚቃረኑ", "የሥላሴ አስተምህሮ ጥልቅ አመክንዮአዊ ጥናት የሚፈልግና ከተራ ፍጡር ማንነት የተለየ መሆኑን", "የሞዳሊዝም እውነተኝነትን", "የአርዮስን ትክክለኛነት"], a: 1 }
+    ];
+
+    // ጥያቄዎችን በገጹ ላይ ማውጣት
+    const container = document.getElementById('quiz-container');
+    questions.forEach((item, index) => {
+        let qHtml = `
+            <div class="question-block" id="q-block-${index}">
+                <div class="question-text">${index + 1}. ${item.q}</div>
+                <ul class="options">
+        `;
+        item.o.forEach((opt, oIdx) => {
+            qHtml += `
+                <li>
+                    <label>
+                        <input type="radio" name="question-${index}" value="${oIdx}">
+                        ${opt}
+                    </label>
+                </li>
+            `;
+        });
+        qHtml += `
+                </ul>
+            </div>
+        `;
+        container.innerHTML += qHtml;
+    });
+
+    // ውጤት ለማስላት እና ወደ ቴሌግራም ለመላክ የሚሰራ ፋንክሽን
+    function submitQuiz() {
+        // የተጠቃሚ መረጃዎችን ማረጋገጥ
+        const fullName = document.getElementById('full-name').value.trim();
+        const tgUsername = document.getElementById('tg-username').value.trim();
+
+        if (fullName === "" || tgUsername === "") {
+            alert("እባክዎ መጀመሪያ ሙሉ ስምዎን እና የቴሌግራም ዩዘርኔምዎን ያስገቡ!");
+            return;
+        }
+
+        let score = 0;
+        let total = questions.length;
+        
+        // ሪፖርት መግቢያ ከተፈታኙ መረጃ ጋር
+        let reportDetails = "📊 **TINISHU FAITHMAP QUIZ REPORT** 📊\n";
+        reportDetails += `👤 **ተፈታኝ፦** ${fullName}\n`;
+        reportDetails += `✈️ **ዩዘርኔም፦** ${tgUsername}\n`;
+        reportDetails += "---------------------------------------\n\n";
+        
+        let allAnswered = true;
+
+        for (let i = 0; i < total; i++) {
+            const selected = document.querySelector(`input[name="question-${i}"]:checked`);
+            if (!selected) {
+                allAnswered = false;
+                document.getElementById(`q-block-${i}`).style.border = "1px solid red";
+            } else {
+                document.getElementById(`q-block-${i}`).style.border = "none";
+                let answerValue = parseInt(selected.value);
+                let isCorrect = answerValue === questions[i].a;
+                
+                if (isCorrect) {
+                    score++;
+                }
+                
+                // 100% ፍፁም ትክክለኛ የእርማት ሪፖርት አወቃቀር
+                reportDetails += `❓ **ጥያቄ ${i+1}:** ${questions[i].q}\n`;
+                reportDetails += `❌ **የተሰጠው ምላሽ:** ${questions[i].o[answerValue]}\n`;
+                reportDetails += `✅ **ትክክለኛው መልስ:** ${questions[i].o[questions[i].a]}\n`;
+                reportDetails += `📢 **እርማት ሁኔታ:** ${isCorrect ? '🔴 ትክክል (Correct)' : '⚫ ስህተት (Incorrect)'}\n`;
+                reportDetails += "---------------------------------------\n";
+            }
+        }
+
+        if (!allAnswered) {
+            alert("እባክዎ ሁሉንም ጥያቄዎች ይመልሱ! (ያልተመለሱት በደማቅ ቀይ ምልክት ተደርጎባቸዋል)");
+            return;
+        }
+
+        let finalPercentage = ((score / total) * 100).toFixed(2);
+        let summaryText = `🎯 **አጠቃላይ ውጤት፦** ${score} / ${total} (${finalPercentage}%)\n\n`;
+        let fullMessage = summaryText + reportDetails;
+
+        const statusDiv = document.getElementById('result-status');
+        statusDiv.style.display = "block";
+        statusDiv.innerText = "ውጤትና ፍፁም እርማቱ በመላክ ላይ ነው... እባክዎ ይጠብቁ...";
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        
+        // የቴሌግራምን ሊሚት ጠብቆ መልዕክቱን መከፋፈልና መላክ
+        sendLongTelegramMessage(url, CHAT_ID, fullMessage, statusDiv, score, total, finalPercentage);
+    }
+
+    function sendLongTelegramMessage(url, chatId, text, statusElement, score, total, percent) {
+        const chunkSize = 3500;
+        let chunks = [];
+        
+        for (let i = 0; i < text.length; i += chunkSize) {
+            chunks.push(text.substring(i, i + chunkSize));
+        }
+
+        let promises = chunks.map(chunk => {
+            return fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: chunk
+                })
+            });
+        });
+
+        Promise.all(promises)
+            .then(responses => {
+                let allOk = responses.every(res => res.ok);
+                if (allOk) {
+                    statusElement.innerHTML = `🎉 ማጠቃለያ፦ ፈተናውን ጨርሰዋል። ውጤትዎ ${score}/${total} (${percent}%) ነው። ሙሉ 100% ትክክለኛ የእርማት ሪፖርቱ በስኬት ወደ ቴሌግራም ተልኳል!`;
+                    statusElement.style.backgroundColor = "#eeeeee";
+                } else {
+                    statusElement.innerText = "❌ ስህተት፦ ሪፖርቱን መላክ አልተቻለም። ቦቱንና Chat ID ን ያረጋግጡ።";
+                }
+            })
+            .catch(err => {
+                statusElement.innerText = "❌ የኔትወርክ ስህተት አጋጥሟል። እባክዎ ድጋሚ ይሞክሩ።";
+                console.error(err);
+            });
+    }
+</script>
+
+</body>
+</html>
