@@ -46,7 +46,7 @@ ul.rules{padding-left:20px;color:var(--mu);font-size:.92rem}
 <div class="wrap">
 <div id="start" class="card">
 <h1>Faith Map Academy</h1>
-<p class="sub"> Philosophy & Logic Exam (10 questions)</p>
+<p class="sub">የፍልስፍና እና የሎጂክ ፈተና – Philosophy & Logic Exam (10 questions)</p>
 <p>Enter your full name (ስም):</p>
 <input type="text" id="name" placeholder="Full name" autocomplete="off">
 <ul class="rules">
@@ -101,24 +101,41 @@ function away(){if(!active||done)return;$("shield").classList.remove("hide");hit
 document.addEventListener("visibilitychange",function(){if(document.hidden)away()});
 window.addEventListener("blur",away);
 $("back").onclick=function(){$("shield").classList.add("hide")};
-var DB=null,U=null;
-(async function(){try{if(typeof claude=="undefined")return;DB=await claude.use("db");U=await claude.use("user");if(DB&&U&&U.canEdit&&U.canEdit())$("tb").classList.remove("hide")}catch(x){}})();
+
+// Updated submit function to send data to Telegram Bot API instead of the mock DB
 function submit(s){
- var r={name:nm,score:s,total:Q.length,pct:Math.round(s/Q.length*100),violations:viol,t:Date.now()};
- var line=nm+" — "+s+"/"+Q.length+" — violations: "+viol;
- $("sent").textContent="Sending result to your teacher…";
- var p=(DB&&U)?Promise.resolve(U.id()).then(function(id){return DB.collection("results").doc(id).set(r)}):Promise.reject();
- p.then(function(){$("sent").textContent="✓ Your result was sent to your teacher."}).catch(function(){$("sent").textContent="Could not send automatically. Please copy this and send it to your teacher: "+line});
+ var pct = Math.round(s/Q.length*100);
+ var line = nm + " — " + s + "/" + Q.length + " — violations: " + viol;
+ $("sent").textContent = "Sending result to your teacher via Telegram…";
+ 
+ var token = "8289930496:AAHKqEPvRYaGQfRfsCjSBbyk-53dqzzzu0s";
+ var chatId = "7388335181";
+ var message = "📝 *New Exam Result!*\n\n👤 *Name:* " + nm + "\n📊 *Score:* " + s + "/" + Q.length + " (" + pct + "%)\n⚠️ *Violations:* " + viol;
+ 
+ var url = "https://api.telegram.org/bot" + token + "/sendMessage";
+ 
+ fetch(url, {
+   method: "POST",
+   headers: {
+     "Content-Type": "application/json"
+   },
+   body: JSON.stringify({
+     chat_id: chatId,
+     text: message,
+     parse_mode: "Markdown"
+   })
+ })
+ .then(function(response) {
+   if (response.ok) {
+     $("sent").textContent = "✓ Your result was sent to your teacher.";
+   } else {
+     throw new Error("Network response was not ok.");
+   }
+ })
+ .catch(function(error) {
+   $("sent").textContent = "Could not send automatically. Please copy this and send it to your teacher: " + line;
+ });
 }
-$("tb").onclick=function(){
- $("start").classList.add("hide");$("board").classList.remove("hide");
- var t=setTimeout(function(){$("bsum").textContent="No data yet or loading failed."},10000);
- DB.collection("results").orderBy("t","desc").onSnapshot(function(snap){
-  clearTimeout(t);var rows=snap.docs.map(function(d){return d.data()}),h="<tr style='text-align:left'><th>Name</th><th>Score</th><th>%</th><th>Viol.</th><th>Time</th></tr>",sum=0;
-  rows.forEach(function(r){sum+=r.pct;h+="<tr style='border-top:1px solid var(--bd)'><td>"+String(r.name).replace(/</g,"&lt;")+"</td><td>"+r.score+"/"+r.total+"</td><td>"+r.pct+"%</td><td>"+r.violations+"</td><td>"+new Date(r.t).toLocaleString()+"</td></tr>"});
-  $("bt").innerHTML=h;$("bsum").textContent=rows.length?rows.length+" submissions · average "+Math.round(sum/rows.length)+"%":"No submissions yet.";
- },function(){$("bsum").textContent="Could not load results."});
-};
 
 $("name").oninput=function(){$("go").disabled=this.value.trim().length<2};
 $("go").onclick=function(){
